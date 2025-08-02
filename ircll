@@ -1,0 +1,133 @@
+#!/bin/bash
+
+DEFAULT_PASSWD="ircll"
+IRC_REPO="/opt/hub/repo/radar-intro"
+START_DIR="start"
+STUDENT_FILE="/opt/hub/class/students.txt"
+
+# Check for repo
+if [ ! -d "$IRC_REPO" ]; then
+        echo "No repository $IRC_REPO found."
+        exit 1
+fi
+
+# Display help
+helpFunction()
+{
+   echo ""
+   echo "Usage: $0 [-u username][-a][-s path][-r path]"
+   echo -e "\t-a Update all students"
+   echo -e "\t-r Repository to copy to student accounts [/opt/hub/repo/irc]"
+   echo -e "\t-s Student file path [/opt/hub/class/students.txt]"
+   echo -e "\t-u Username of student to update"
+   echo ""
+   exit 1
+}
+
+# Update user
+updateUserFunction()
+{
+
+	# Check for user
+	if id "$1" &>/dev/null
+	then
+		echo "User $1 found"
+	else
+		# Create user, set password
+		echo "User $1 not found. Creating account..."
+		
+		# Ubuntu
+		sudo adduser --disabled-password --gecos "" "$1"
+		echo -e "$DEFAULT_PASSWD\n$DEFAULT_PASSWD\n" | sudo passwd "$1"
+		
+		# RHEL
+		# sudo adduser -m "$1"
+		# echo -e "$DEFAULT_PASSWD\n$DEFAULT_PASSWD\n" | sudo passwd "$1"
+		
+	fi
+
+	# Create/clean course directory
+	if [ ! -d "/home/$1/$START_DIR" ]
+	then
+		echo "Setting up course for $1..."
+		sudo mkdir "/home/$1/$START_DIR"
+		else
+				echo "Cleaning up for $1..."
+				sudo rm -rf "/home/$1/$START_DIR"
+				sudo mkdir "/home/$1/$START_DIR"
+	fi
+
+	# Copy courseware and set permissions
+	echo "Updating course for $1..."
+	sudo cp -R $IRC_REPO/* "/home/$1/$START_DIR"
+	sudo chmod --recursive o=rwx "/home/$1/$START_DIR"
+
+}
+
+# Parse arguments
+updateAll=""
+updateUser=""
+while getopts "ar:s:u:" opt
+do
+   case "$opt" in
+      a ) updateAll="true" ;;
+	  r ) IRC_REPO="$OPTARG" ;;
+	  s ) STUDENT_FILE="$OPTARG" ;;
+	  u ) updateUser="$OPTARG" ;;
+      ? ) helpFunction ;;
+   esac
+done
+
+# Check for single user
+if [ ! -z $updateUser ]
+then
+
+	# Display information
+	echo ""
+	echo "---Single user update---"
+	echo "Courseware repository path: $IRC_REPO"
+	echo "Default password: $DEFAULT_PASSWD"
+	echo "Username: $updateUser"
+
+	# Update single user
+	updateUserFunction $updateUser
+	
+	echo ""
+	
+	exit 0
+fi
+
+# Check for update all
+if [ ! -z $updateAll ]
+then
+
+	# Display information
+	echo ""
+	echo "---All user update---"
+	echo "Courseware repository path: $IRC_REPO"
+	echo "Default password: $DEFAULT_PASSWD"
+	echo "Student file path: $STUDENT_FILE"
+
+	# Check for student list
+	if [ ! -f "$STUDENT_FILE" ]; then
+		echo "No student file $STUDENT_FILE found."
+		exit 1
+	fi
+
+	# Extract student list
+	STUDENTS=$(cat "$STUDENT_FILE")
+
+	# Iterate over students
+	for user in $STUDENTS
+	do
+		updateUserFunction $user
+	done
+	
+	echo ""
+	
+	exit 0
+	
+fi
+
+# Catch no options
+helpFunction
