@@ -810,13 +810,13 @@ c = get_config()  #noqa
 #  
 #          When setting this, you should also set ssl_key
 #  Default: ''
-c.JupyterHub.ssl_cert = '/etc/letsencrypt/live/lab1.ircll.org/fullchain.pem'
+c.JupyterHub.ssl_cert = !</etc/letsencrypt/live/site-name/fullchain.pem>!
 
 ## Path to SSL key file for the public facing interface of the proxy
 #  
 #          When setting this, you should also set ssl_cert
 #  Default: ''
-c.JupyterHub.ssl_key = '/etc/letsencrypt/live/lab1.ircll.org/privkey.pem'
+c.JupyterHub.ssl_key = !</etc/letsencrypt/live/site-name/privkey.pem>!
 
 ## Host to send statsd metrics to. An empty string (the default) disables sending
 #  metrics.
@@ -1839,3 +1839,6 @@ c.Authenticator.allow_all = True
 ## The number of threads to allocate for encryption
 #  Default: 2
 # c.CryptKeeper.n_threads = 2
+
+# Redirect HTTP to HTTPS
+c.ConfigurableHTTPProxy.command = ['configurable-http-proxy', '--redirect-port', '80', '--redirect-to', '443']
