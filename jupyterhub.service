@@ -1,0 +1,21 @@
+[Unit]
+Description=JupyterHub
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+UMask=0002
+
+ExecStart=/bin/bash -c 'cd /opt/hub && source /opt/hub/env/bin/activate && /opt/hub/env/bin/jupyterhub -f /opt/hub/jupyterhub_config.py --port 443'
+TimeoutStartSec=60
+
+Restart=on-failure
+RestartSec=60
+
+ExecStop=/bin/pkill -15 -f jupyterhub
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target
