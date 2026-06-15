@@ -9,7 +9,7 @@ body { background-color:#0D2534; padding:0;  margin: 0; }
 #container_1fd9e86b { vertical-align: top; position:relative; display: inline-block; width:100%; min-height:150px; background:none;  }
 #container_1fd9e86b_padding { margin: 10px; display: block;  }
 .textstyle2 { text-align:center; }
-#img_6fab104c { vertical-align: bottom; position:relative; display: inline-block; width:39%; background:none; height:auto;  }
+#img_6fab104c { vertical-align: bottom; position:relative; display: inline-block; width:39%; min-width:500px; background:none; height:auto;  }
 #container_54a1c552 { vertical-align: top; position:relative; display: inline-block; width:100%; min-height:150px; background:none;  }
 #container_54a1c552_padding { margin: 10px; display: block;  }
 .textstyle3 { font-size:16pt; font-family:Arial, Helvetica, sans-serif; color:#FFFFFF; font-weight:bold;  }
